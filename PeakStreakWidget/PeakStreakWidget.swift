@@ -144,8 +144,8 @@ struct StreakWidgetEntryView: View {
 struct SmallWidgetView: View {
     let habit: WidgetHabitData
     
-    private let weekCount = 8
-    private let cellSize: CGFloat = 16
+    private let weekCount = 7
+    private let cellSize: CGFloat = 18
     private let cellSpacing: CGFloat = 2
     
     var body: some View {
@@ -230,8 +230,8 @@ struct SmallWidgetView: View {
 struct MediumWidgetView: View {
     let habit: WidgetHabitData
     
-    private let weekCount = 17
-    private let cellSize: CGFloat = 16
+    private let weekCount = 16
+    private let cellSize: CGFloat = 18
     private let cellSpacing: CGFloat = 2
     
     var body: some View {
