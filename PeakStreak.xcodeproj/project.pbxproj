@@ -6,14 +6,66 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		359D338D2EE78F4500DBD26E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359D338C2EE78F4500DBD26E /* WidgetKit.framework */; };
+		359D338F2EE78F4500DBD26E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359D338E2EE78F4500DBD26E /* SwiftUI.framework */; };
+		359D33A02EE78F4700DBD26E /* PeakStreakWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 359D338A2EE78F4500DBD26E /* PeakStreakWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		359D339E2EE78F4700DBD26E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 359D33542EE7894D00DBD26E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 359D33892EE78F4500DBD26E;
+			remoteInfo = PeakStreakWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		359D33A52EE78F4800DBD26E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				359D33A02EE78F4700DBD26E /* PeakStreakWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		359D335C2EE7894D00DBD26E /* PeakStreak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PeakStreak.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		359D338A2EE78F4500DBD26E /* PeakStreakWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PeakStreakWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		359D338C2EE78F4500DBD26E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		359D338E2EE78F4500DBD26E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		359D33A92EE7911100DBD26E /* PeakStreakWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PeakStreakWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		359D33A12EE78F4700DBD26E /* Exceptions for "PeakStreakWidget" folder in "PeakStreakWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 359D33892EE78F4500DBD26E /* PeakStreakWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		359D335E2EE7894D00DBD26E /* PeakStreak */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PeakStreak;
+			sourceTree = "<group>";
+		};
+		359D33902EE78F4500DBD26E /* PeakStreakWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				359D33A12EE78F4700DBD26E /* Exceptions for "PeakStreakWidget" folder in "PeakStreakWidgetExtension" target */,
+			);
+			path = PeakStreakWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,13 +78,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		359D33872EE78F4500DBD26E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				359D338F2EE78F4500DBD26E /* SwiftUI.framework in Frameworks */,
+				359D338D2EE78F4500DBD26E /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		359D33532EE7894D00DBD26E = {
 			isa = PBXGroup;
 			children = (
+				359D33A92EE7911100DBD26E /* PeakStreakWidgetExtension.entitlements */,
 				359D335E2EE7894D00DBD26E /* PeakStreak */,
+				359D33902EE78F4500DBD26E /* PeakStreakWidget */,
+				359D338B2EE78F4500DBD26E /* Frameworks */,
 				359D335D2EE7894D00DBD26E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,8 +105,18 @@
 			isa = PBXGroup;
 			children = (
 				359D335C2EE7894D00DBD26E /* PeakStreak.app */,
+				359D338A2EE78F4500DBD26E /* PeakStreakWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		359D338B2EE78F4500DBD26E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				359D338C2EE78F4500DBD26E /* WidgetKit.framework */,
+				359D338E2EE78F4500DBD26E /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -55,10 +129,12 @@
 				359D33582EE7894D00DBD26E /* Sources */,
 				359D33592EE7894D00DBD26E /* Frameworks */,
 				359D335A2EE7894D00DBD26E /* Resources */,
+				359D33A52EE78F4800DBD26E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				359D339F2EE78F4700DBD26E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				359D335E2EE7894D00DBD26E /* PeakStreak */,
@@ -69,6 +145,28 @@
 			productName = PeakStreak;
 			productReference = 359D335C2EE7894D00DBD26E /* PeakStreak.app */;
 			productType = "com.apple.product-type.application";
+		};
+		359D33892EE78F4500DBD26E /* PeakStreakWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 359D33A22EE78F4800DBD26E /* Build configuration list for PBXNativeTarget "PeakStreakWidgetExtension" */;
+			buildPhases = (
+				359D33862EE78F4500DBD26E /* Sources */,
+				359D33872EE78F4500DBD26E /* Frameworks */,
+				359D33882EE78F4500DBD26E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				359D33902EE78F4500DBD26E /* PeakStreakWidget */,
+			);
+			name = PeakStreakWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PeakStreakWidgetExtension;
+			productReference = 359D338A2EE78F4500DBD26E /* PeakStreakWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -81,6 +179,9 @@
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					359D335B2EE7894D00DBD26E = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
+					359D33892EE78F4500DBD26E = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
 				};
@@ -100,12 +201,20 @@
 			projectRoot = "";
 			targets = (
 				359D335B2EE7894D00DBD26E /* PeakStreak */,
+				359D33892EE78F4500DBD26E /* PeakStreakWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		359D335A2EE7894D00DBD26E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		359D33882EE78F4500DBD26E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +231,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		359D33862EE78F4500DBD26E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		359D339F2EE78F4700DBD26E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 359D33892EE78F4500DBD26E /* PeakStreakWidgetExtension */;
+			targetProxy = 359D339E2EE78F4700DBD26E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		359D33652EE7894F00DBD26E /* Debug */ = {
@@ -251,6 +375,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PeakStreak/PeakStreak.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XAA6P4Q6;
@@ -283,6 +408,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = PeakStreak/PeakStreak.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XAA6P4Q6;
@@ -310,6 +436,68 @@
 			};
 			name = Release;
 		};
+		359D33A32EE78F4800DBD26E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PeakStreakWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93XAA6P4Q6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PeakStreakWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PeakStreakWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsiddharth.PeakStreak.PeakStreakWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		359D33A42EE78F4800DBD26E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PeakStreakWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 93XAA6P4Q6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PeakStreakWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PeakStreakWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.itsiddharth.PeakStreak.PeakStreakWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -327,6 +515,15 @@
 			buildConfigurations = (
 				359D33682EE7894F00DBD26E /* Debug */,
 				359D33692EE7894F00DBD26E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		359D33A22EE78F4800DBD26E /* Build configuration list for PBXNativeTarget "PeakStreakWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				359D33A32EE78F4800DBD26E /* Debug */,
+				359D33A42EE78F4800DBD26E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
