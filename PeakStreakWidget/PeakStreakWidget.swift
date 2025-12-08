@@ -147,21 +147,63 @@ struct SmallWidgetView: View {
     private let weekCount = 7
     private let cellSize: CGFloat = 18
     private let cellSpacing: CGFloat = 2
+    private let outerCornerRadius: CGFloat = 16
+    private let innerCornerRadius: CGFloat = 2
     
     var body: some View {
+        let weeks = getWeeks()
+        
         HStack(spacing: cellSpacing) {
-            ForEach(getWeeks().indices, id: \.self) { weekIndex in
+            ForEach(weeks.indices, id: \.self) { weekIndex in
                 VStack(spacing: cellSpacing) {
-                    ForEach(getWeeks()[weekIndex], id: \.self) { date in
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(cellColor(for: date))
-                            .frame(width: cellSize, height: cellSize)
+                    ForEach(Array(weeks[weekIndex].enumerated()), id: \.element) { dayIndex, date in
+                        let corners = cornerRadius(weekIndex: weekIndex, dayIndex: dayIndex, totalWeeks: weeks.count)
+                        
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: corners.topLeading,
+                            bottomLeadingRadius: corners.bottomLeading,
+                            bottomTrailingRadius: corners.bottomTrailing,
+                            topTrailingRadius: corners.topTrailing
+                        )
+                        .fill(cellColor(for: date))
+                        .frame(width: cellSize, height: cellSize)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(6)
+    }
+    
+    private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
+        let isFirstWeek = weekIndex == 0
+        let isLastWeek = weekIndex == totalWeeks - 1
+        let isFirstDay = dayIndex == 0
+        let isLastDay = dayIndex == 6
+        
+        var topLeading: CGFloat = innerCornerRadius
+        var bottomLeading: CGFloat = innerCornerRadius
+        var bottomTrailing: CGFloat = innerCornerRadius
+        var topTrailing: CGFloat = innerCornerRadius
+        
+        // Top-left corner of grid
+        if isFirstWeek && isFirstDay {
+            topLeading = outerCornerRadius
+        }
+        // Bottom-left corner of grid
+        if isFirstWeek && isLastDay {
+            bottomLeading = outerCornerRadius
+        }
+        // Top-right corner of grid
+        if isLastWeek && isFirstDay {
+            topTrailing = outerCornerRadius
+        }
+        // Bottom-right corner of grid
+        if isLastWeek && isLastDay {
+            bottomTrailing = outerCornerRadius
+        }
+        
+        return (topLeading, bottomLeading, bottomTrailing, topTrailing)
     }
     
     private func getWeeks() -> [[Date]] {
@@ -233,21 +275,59 @@ struct MediumWidgetView: View {
     private let weekCount = 16
     private let cellSize: CGFloat = 18
     private let cellSpacing: CGFloat = 2
+    private let outerCornerRadius: CGFloat = 16
+    private let innerCornerRadius: CGFloat = 2
     
     var body: some View {
+        let weeks = getWeeks()
+        
         HStack(spacing: cellSpacing) {
-            ForEach(getWeeks().indices, id: \.self) { weekIndex in
+            ForEach(weeks.indices, id: \.self) { weekIndex in
                 VStack(spacing: cellSpacing) {
-                    ForEach(getWeeks()[weekIndex], id: \.self) { date in
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(cellColor(for: date))
-                            .frame(width: cellSize, height: cellSize)
+                    ForEach(Array(weeks[weekIndex].enumerated()), id: \.element) { dayIndex, date in
+                        let corners = cornerRadius(weekIndex: weekIndex, dayIndex: dayIndex, totalWeeks: weeks.count)
+                        
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: corners.topLeading,
+                            bottomLeadingRadius: corners.bottomLeading,
+                            bottomTrailingRadius: corners.bottomTrailing,
+                            topTrailingRadius: corners.topTrailing
+                        )
+                        .fill(cellColor(for: date))
+                        .frame(width: cellSize, height: cellSize)
                     }
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(6)
+    }
+    
+    private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
+        let isFirstWeek = weekIndex == 0
+        let isLastWeek = weekIndex == totalWeeks - 1
+        let isFirstDay = dayIndex == 0
+        let isLastDay = dayIndex == 6
+        
+        var topLeading: CGFloat = innerCornerRadius
+        var bottomLeading: CGFloat = innerCornerRadius
+        var bottomTrailing: CGFloat = innerCornerRadius
+        var topTrailing: CGFloat = innerCornerRadius
+        
+        if isFirstWeek && isFirstDay {
+            topLeading = outerCornerRadius
+        }
+        if isFirstWeek && isLastDay {
+            bottomLeading = outerCornerRadius
+        }
+        if isLastWeek && isFirstDay {
+            topTrailing = outerCornerRadius
+        }
+        if isLastWeek && isLastDay {
+            bottomTrailing = outerCornerRadius
+        }
+        
+        return (topLeading, bottomLeading, bottomTrailing, topTrailing)
     }
     
     private func getWeeks() -> [[Date]] {
