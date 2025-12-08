@@ -145,10 +145,10 @@ struct SmallWidgetView: View {
     let habit: WidgetHabitData
     
     private let weekCount = 7
-    private let cellSize: CGFloat = 18
-    private let cellSpacing: CGFloat = 2
+    private let cellSize: CGFloat = 17
+    private let cellSpacing: CGFloat = 4
     private let outerCornerRadius: CGFloat = 16
-    private let innerCornerRadius: CGFloat = 2
+    private let innerCornerRadius: CGFloat = 4
     
     var body: some View {
         let weeks = getWeeks()
@@ -272,11 +272,11 @@ struct SmallWidgetView: View {
 struct MediumWidgetView: View {
     let habit: WidgetHabitData
     
-    private let weekCount = 16
-    private let cellSize: CGFloat = 18
-    private let cellSpacing: CGFloat = 2
+    private let weekCount = 15
+    private let cellSize: CGFloat = 17
+    private let cellSpacing: CGFloat = 4
     private let outerCornerRadius: CGFloat = 16
-    private let innerCornerRadius: CGFloat = 2
+    private let innerCornerRadius: CGFloat = 4
     
     var body: some View {
         let weeks = getWeeks()
