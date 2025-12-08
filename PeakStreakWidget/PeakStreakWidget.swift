@@ -144,8 +144,8 @@ struct StreakWidgetEntryView: View {
 struct SmallWidgetView: View {
     let habit: WidgetHabitData
     
-    private let weekCount = 11
-    private let cellSize: CGFloat = 10
+    private let weekCount = 8
+    private let cellSize: CGFloat = 16
     private let cellSpacing: CGFloat = 2
     
     var body: some View {
@@ -153,7 +153,7 @@ struct SmallWidgetView: View {
             ForEach(getWeeks().indices, id: \.self) { weekIndex in
                 VStack(spacing: cellSpacing) {
                     ForEach(getWeeks()[weekIndex], id: \.self) { date in
-                        RoundedRectangle(cornerRadius: 1)
+                        RoundedRectangle(cornerRadius: 2)
                             .fill(cellColor(for: date))
                             .frame(width: cellSize, height: cellSize)
                     }
@@ -161,7 +161,7 @@ struct SmallWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(8)
+        .padding(6)
     }
     
     private func getWeeks() -> [[Date]] {
@@ -230,8 +230,8 @@ struct SmallWidgetView: View {
 struct MediumWidgetView: View {
     let habit: WidgetHabitData
     
-    private let weekCount = 26
-    private let cellSize: CGFloat = 10
+    private let weekCount = 17
+    private let cellSize: CGFloat = 16
     private let cellSpacing: CGFloat = 2
     
     var body: some View {
@@ -239,7 +239,7 @@ struct MediumWidgetView: View {
             ForEach(getWeeks().indices, id: \.self) { weekIndex in
                 VStack(spacing: cellSpacing) {
                     ForEach(getWeeks()[weekIndex], id: \.self) { date in
-                        RoundedRectangle(cornerRadius: 1)
+                        RoundedRectangle(cornerRadius: 2)
                             .fill(cellColor(for: date))
                             .frame(width: cellSize, height: cellSize)
                     }
@@ -247,7 +247,7 @@ struct MediumWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(8)
+        .padding(6)
     }
     
     private func getWeeks() -> [[Date]] {
