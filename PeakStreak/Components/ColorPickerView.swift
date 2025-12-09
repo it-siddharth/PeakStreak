@@ -11,14 +11,10 @@ struct HabitColorPickerView: View {
     @Binding var selectedColorHex: String
     
     var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Color")
-                .font(AppTheme.Typography.headline)
-                .foregroundColor(AppTheme.Colors.textPrimary)
-            
-            HStack(spacing: AppTheme.Spacing.sm) {
+        VStack(spacing: AppTheme.Spacing.md) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.md), count: 6), spacing: AppTheme.Spacing.md) {
                 ForEach(AppTheme.Colors.habitColors, id: \.hex) { item in
-                    ColorButton(
+                    ColorCircleButton(
                         color: item.color,
                         hex: item.hex,
                         isSelected: selectedColorHex == item.hex
@@ -30,43 +26,11 @@ struct HabitColorPickerView: View {
                 }
             }
         }
-        .padding(AppTheme.Spacing.md)
-        .background(AppTheme.Colors.backgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
-    }
-}
-
-struct ColorButton: View {
-    let color: Color
-    let hex: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(color)
-                    .frame(width: 32, height: 32)
-                
-                if isSelected {
-                    Circle()
-                        .stroke(Color.white, lineWidth: 2)
-                        .frame(width: 26, height: 26)
-                    
-                    Circle()
-                        .stroke(color, lineWidth: 3)
-                        .frame(width: 40, height: 40)
-                }
-            }
-            .frame(width: 40, height: 40)
-        }
-        .buttonStyle(.plain)
     }
 }
 
 #Preview {
-    HabitColorPickerView(selectedColorHex: .constant("#FF5A5F"))
+    HabitColorPickerView(selectedColorHex: .constant("#737373"))
         .padding()
+        .background(AppTheme.Colors.background)
 }
-

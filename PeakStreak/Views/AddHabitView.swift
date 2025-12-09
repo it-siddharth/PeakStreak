@@ -13,118 +13,112 @@ struct AddHabitView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var habitName: String = ""
-    @State private var selectedIcon: String = "star.fill"
-    @State private var selectedColorHex: String = "#FF5A5F"
+    @State private var selectedColorHex: String = "#737373"
     
     @FocusState private var isNameFocused: Bool
-    
-    private var selectedColor: Color {
-        Color(hex: selectedColorHex) ?? AppTheme.Colors.coral
-    }
     
     private var isValid: Bool {
         !habitName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AppTheme.Colors.backgroundSecondary
-                    .ignoresSafeArea()
+        ZStack {
+            // Background
+            AppTheme.Colors.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Navigation Bar
+                navigationBar
                 
-                ScrollView {
-                    VStack(spacing: AppTheme.Spacing.lg) {
-                        // Preview Card
-                        previewCard
-                        
-                        // Name Input
-                        nameInputSection
-                        
-                        // Icon Picker
-                        IconPickerView(selectedIcon: $selectedIcon, accentColor: selectedColor)
-                        
-                        // Color Picker
-                        HabitColorPickerView(selectedColorHex: $selectedColorHex)
-                        
-                        Spacer(minLength: 100)
-                    }
-                    .padding(AppTheme.Spacing.md)
-                }
+                Spacer()
                 
-                // Save Button
-                VStack {
-                    Spacer()
-                    
-                    Button(action: saveHabit) {
-                        Text("Create Habit")
-                    }
-                    .buttonStyle(PrimaryButtonStyle(color: selectedColor))
-                    .disabled(!isValid)
-                    .opacity(isValid ? 1 : 0.5)
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.bottom, AppTheme.Spacing.lg)
-                }
+                // Name Input
+                nameInputSection
+                
+                // Color Picker (for widget)
+                colorPickerSection
+                    .padding(.top, AppTheme.Spacing.xxxl)
+                
+                Spacer()
+                
+                // Add Journey Button
+                addButton
+                    .padding(.horizontal, AppTheme.Spacing.xxl)
+                    .padding(.bottom, AppTheme.Spacing.xxxl)
             }
-            .navigationTitle("New Habit")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                }
-            }
-            .onAppear {
-                isNameFocused = true
-            }
+        }
+        .onAppear {
+            isNameFocused = true
         }
     }
     
-    // MARK: - Preview Card
-    private var previewCard: some View {
-        VStack(spacing: AppTheme.Spacing.md) {
-            ZStack {
-                Circle()
-                    .fill(selectedColor.opacity(0.15))
-                    .frame(width: 80, height: 80)
-                
-                Image(systemName: selectedIcon)
-                    .font(.system(size: 36, weight: .semibold))
-                    .foregroundColor(selectedColor)
+    // MARK: - Navigation Bar
+    private var navigationBar: some View {
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.text)
             }
             
-            Text(habitName.isEmpty ? "Habit Name" : habitName)
-                .font(AppTheme.Typography.title3)
-                .foregroundColor(habitName.isEmpty ? AppTheme.Colors.textTertiary : AppTheme.Colors.textPrimary)
-                .lineLimit(1)
+            Spacer()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, AppTheme.Spacing.xl)
-        .cardStyle()
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.top, AppTheme.Spacing.md)
     }
     
     // MARK: - Name Input
     private var nameInputSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Name")
-                .font(AppTheme.Typography.headline)
-                .foregroundColor(AppTheme.Colors.textPrimary)
-            
-            TextField("e.g., Morning Exercise", text: $habitName)
+        VStack(spacing: AppTheme.Spacing.sm) {
+            Text("Name your journey")
                 .font(AppTheme.Typography.body)
-                .padding(AppTheme.Spacing.md)
-                .background(AppTheme.Colors.backgroundPrimary)
-                .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
-                        .stroke(isNameFocused ? selectedColor : AppTheme.Colors.border, lineWidth: isNameFocused ? 2 : 1)
-                )
+                .foregroundColor(AppTheme.Colors.text)
+            
+            TextField("", text: $habitName)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+                .multilineTextAlignment(.center)
                 .focused($isNameFocused)
+                .tint(AppTheme.Colors.text)
+            
+            // Underline
+            Rectangle()
+                .fill(AppTheme.Colors.text)
+                .frame(height: 1)
+                .padding(.horizontal, AppTheme.Spacing.xxxl)
         }
-        .padding(AppTheme.Spacing.md)
-        .background(AppTheme.Colors.backgroundSecondary)
-        .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
+        .padding(.horizontal, AppTheme.Spacing.xxl)
+    }
+    
+    // MARK: - Color Picker
+    private var colorPickerSection: some View {
+        VStack(spacing: AppTheme.Spacing.sm) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AppTheme.Spacing.md), count: 6), spacing: AppTheme.Spacing.md) {
+                ForEach(AppTheme.Colors.habitColors, id: \.hex) { item in
+                    ColorCircleButton(
+                        color: item.color,
+                        hex: item.hex,
+                        isSelected: selectedColorHex == item.hex
+                    ) {
+                        withAnimation(AppTheme.Animation.quick) {
+                            selectedColorHex = item.hex
+                        }
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, AppTheme.Spacing.xxl)
+    }
+    
+    // MARK: - Add Button
+    private var addButton: some View {
+        Button(action: saveHabit) {
+            Text("Add journey")
+        }
+        .buttonStyle(PillButtonStyle())
+        .disabled(!isValid)
+        .opacity(isValid ? 1 : 0.5)
     }
     
     // MARK: - Actions
@@ -134,13 +128,38 @@ struct AddHabitView: View {
         
         let habit = Habit(
             name: trimmedName,
-            icon: selectedIcon,
+            icon: "star.fill",
             colorHex: selectedColorHex
         )
         
         modelContext.insert(habit)
-        
         dismiss()
+    }
+}
+
+// MARK: - Color Circle Button
+struct ColorCircleButton: View {
+    let color: Color
+    let hex: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(color)
+                    .frame(width: 44, height: 44)
+                
+                if isSelected {
+                    Circle()
+                        .stroke(AppTheme.Colors.text, lineWidth: 2)
+                        .frame(width: 52, height: 52)
+                }
+            }
+            .frame(width: 52, height: 52)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -148,4 +167,3 @@ struct AddHabitView: View {
     AddHabitView()
         .modelContainer(for: [Habit.self, HabitEntry.self], inMemory: true)
 }
-

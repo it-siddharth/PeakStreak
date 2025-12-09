@@ -14,286 +14,205 @@ struct HabitListView: View {
     @Query(sort: \Habit.createdAt, order: .reverse) private var habits: [Habit]
     
     @State private var showingAddHabit = false
+    @State private var selectedHabitIndex: Int = 0
     @State private var selectedHabit: Habit?
     
-    private var completedTodayCount: Int {
-        habits.filter { $0.isCompleted(for: Date()) }.count
+    private var currentHabit: Habit? {
+        guard !habits.isEmpty, selectedHabitIndex < habits.count else { return nil }
+        return habits[selectedHabitIndex]
+    }
+    
+    private var isCurrentHabitCompletedToday: Bool {
+        currentHabit?.isCompleted(for: Date()) ?? false
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                // Background
-                AppTheme.Colors.backgroundSecondary
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: AppTheme.Spacing.lg) {
-                        // Header Stats Card
-                        headerCard
-                        
-                        // Habits Section
-                        if habits.isEmpty {
-                            emptyStateView
-                        } else {
-                            habitsSection
-                        }
-                    }
-                    .padding(.horizontal, AppTheme.Spacing.md)
-                    .padding(.top, AppTheme.Spacing.md)
-                    .padding(.bottom, AppTheme.Spacing.xxxl)
+        ZStack {
+            // Background
+            AppTheme.Colors.background
+                .ignoresSafeArea()
+            
+            if habits.isEmpty {
+                // Empty State - Begin Journey
+                emptyStateView
+            } else {
+                // Main Content
+                mainContentView
+            }
+            
+            // Add Button (top right)
+            VStack {
+                HStack {
+                    Spacer()
+                    addButton
                 }
-            }
-            .navigationTitle("PeakStreak")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: createTestHabit) {
-                        Text("Test Habit")
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundColor(AppTheme.Colors.teal)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: { showingAddHabit = true }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(AppTheme.Colors.coral)
-                    }
-                }
-            }
-            .sheet(isPresented: $showingAddHabit) {
-                AddHabitView()
-            }
-            .navigationDestination(item: $selectedHabit) { habit in
-                HabitDetailView(habit: habit)
-            }
-            .onChange(of: habits.count) {
-                refreshWidget()
-            }
-            .onAppear {
-                refreshWidget()
-            }
-        }
-    }
-    
-    // MARK: - Header Card
-    private var headerCard: some View {
-        VStack(spacing: AppTheme.Spacing.md) {
-            HStack {
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xxs) {
-                    Text(Date().formatted(.dateTime.weekday(.wide)))
-                        .font(AppTheme.Typography.subheadline)
-                        .foregroundColor(AppTheme.Colors.textSecondary)
-                    
-                    Text(Date().formatted(.dateTime.month(.wide).day()))
-                        .font(AppTheme.Typography.title2)
-                        .foregroundColor(AppTheme.Colors.textPrimary)
-                }
+                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.top, AppTheme.Spacing.md)
                 
                 Spacer()
-                
-                // Progress Ring
-                ZStack {
-                    Circle()
-                        .stroke(AppTheme.Colors.backgroundTertiary, lineWidth: 6)
-                        .frame(width: 60, height: 60)
-                    
-                    Circle()
-                        .trim(from: 0, to: habits.isEmpty ? 0 : CGFloat(completedTodayCount) / CGFloat(habits.count))
-                        .stroke(
-                            AppTheme.Colors.coral,
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                        )
-                        .frame(width: 60, height: 60)
-                        .rotationEffect(.degrees(-90))
-                        .animation(AppTheme.Animation.smooth, value: completedTodayCount)
-                    
-                    VStack(spacing: 0) {
-                        Text("\(completedTodayCount)")
-                            .font(AppTheme.Typography.headline)
-                            .foregroundColor(AppTheme.Colors.textPrimary)
-                        Text("/\(habits.count)")
-                            .font(AppTheme.Typography.caption)
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                    }
-                }
-            }
-            
-            // Motivational message
-            if habits.isEmpty {
-                Text("Start your journey by adding your first habit")
-                    .font(AppTheme.Typography.subheadline)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-            } else if completedTodayCount == habits.count && habits.count > 0 {
-                HStack(spacing: AppTheme.Spacing.xs) {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                    Text("All habits completed today!")
-                        .font(AppTheme.Typography.subheadline)
-                        .foregroundColor(AppTheme.Colors.teal)
-                }
-            } else {
-                Text("\(habits.count - completedTodayCount) habit\(habits.count - completedTodayCount == 1 ? "" : "s") remaining today")
-                    .font(AppTheme.Typography.subheadline)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
             }
         }
-        .padding(AppTheme.Spacing.lg)
-        .cardStyle()
+        .sheet(isPresented: $showingAddHabit) {
+            AddHabitView()
+        }
+        .fullScreenCover(item: $selectedHabit) { habit in
+            HabitDetailView(habit: habit)
+        }
+        .onChange(of: habits.count) {
+            refreshWidget()
+            // Reset index if out of bounds
+            if selectedHabitIndex >= habits.count {
+                selectedHabitIndex = max(0, habits.count - 1)
+            }
+        }
+        .onAppear {
+            refreshWidget()
+        }
     }
     
-    // MARK: - Empty State
-    private var emptyStateView: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
-            Spacer()
-                .frame(height: 60)
-            
+    // MARK: - Add Button
+    private var addButton: some View {
+        Button(action: { showingAddHabit = true }) {
             ZStack {
                 Circle()
-                    .fill(AppTheme.Colors.coral.opacity(0.1))
-                    .frame(width: 120, height: 120)
+                    .fill(Color.white)
+                    .frame(width: 50, height: 50)
                 
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 50))
-                    .foregroundColor(AppTheme.Colors.coral)
+                Image(systemName: "plus")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(.black)
             }
-            
-            VStack(spacing: AppTheme.Spacing.xs) {
-                Text("No habits yet")
-                    .font(AppTheme.Typography.title2)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                
-                Text("Add your first habit to start\nbuilding your streak")
-                    .font(AppTheme.Typography.body)
-                    .foregroundColor(AppTheme.Colors.textSecondary)
-                    .multilineTextAlignment(.center)
-            }
-            
-            Button(action: { showingAddHabit = true }) {
-                HStack(spacing: AppTheme.Spacing.xs) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .semibold))
-                    Text("Add Habit")
-                }
-            }
-            .buttonStyle(PrimaryButtonStyle())
-            .frame(maxWidth: 200)
-            .padding(.top, AppTheme.Spacing.md)
-            
-            Spacer()
         }
-        .padding(AppTheme.Spacing.xl)
     }
     
-    // MARK: - Habits Section
-    private var habitsSection: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Your Habits")
-                .font(AppTheme.Typography.headline)
-                .foregroundColor(AppTheme.Colors.textSecondary)
-                .padding(.leading, AppTheme.Spacing.xxs)
+    // MARK: - Empty State (Begin Journey)
+    private var emptyStateView: some View {
+        VStack {
+            Spacer()
             
-            LazyVStack(spacing: AppTheme.Spacing.sm) {
-                ForEach(habits) { habit in
-                    HabitRowView(habit: habit)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            selectedHabit = habit
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                deleteHabit(habit)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
+            Button(action: { showingAddHabit = true }) {
+                Text("Begin Journey")
+            }
+            .buttonStyle(PillButtonStyle())
+            
+            SquiggleView()
+                .frame(width: 80, height: 24)
+                .padding(.top, AppTheme.Spacing.lg)
+            
+            Spacer()
+                .frame(height: 100)
+        }
+    }
+    
+    // MARK: - Main Content
+    private var mainContentView: some View {
+        VStack(spacing: 0) {
+            // Quote Section
+            quoteSection
+                .padding(.top, 60)
+            
+            // Squiggle
+            SquiggleView()
+                .frame(width: 80, height: 24)
+                .padding(.top, AppTheme.Spacing.sm)
+            
+            // Horizontal Swipeable Habit Cards
+            habitCardsSection
+            
+            Spacer()
+            
+            // Mark for Today Button
+            markButton
+                .padding(.horizontal, AppTheme.Spacing.xxl)
+                .padding(.bottom, AppTheme.Spacing.xxxl)
+        }
+    }
+    
+    // MARK: - Quote Section
+    private var quoteSection: some View {
+        VStack(spacing: 0) {
+            Text("\"")
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+            
+            Text("A journey that you do for\nyour better self")
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+            
+            Text("\"")
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+        }
+        .padding(.horizontal, AppTheme.Spacing.xxl)
+    }
+    
+    // MARK: - Habit Cards Section
+    private var habitCardsSection: some View {
+        TabView(selection: $selectedHabitIndex) {
+            ForEach(Array(habits.enumerated()), id: \.element.id) { index, habit in
+                HabitCardView(habit: habit) {
+                    selectedHabit = habit
                 }
+                .tag(index)
             }
         }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .frame(height: 320)
+        .padding(.top, AppTheme.Spacing.xl)
+    }
+    
+    // MARK: - Mark Button
+    private var markButton: some View {
+        Button(action: {
+            guard let habit = currentHabit else { return }
+            withAnimation(AppTheme.Animation.bouncy) {
+                habit.toggleCompletion(for: Date(), context: modelContext)
+            }
+            refreshWidget()
+        }) {
+            Text(isCurrentHabitCompletedToday ? "Done for today" : "Mark for today")
+        }
+        .buttonStyle(PillButtonStyle(isFilled: isCurrentHabitCompletedToday))
+        .disabled(currentHabit == nil)
     }
     
     // MARK: - Actions
-    private func deleteHabit(_ habit: Habit) {
-        withAnimation {
-            modelContext.delete(habit)
-        }
-    }
-    
-    private func createTestHabit() {
-        // Random habit names and icons
-        let testHabits: [(name: String, icon: String)] = [
-            ("Morning Run", "figure.run"),
-            ("Meditation", "brain.head.profile"),
-            ("Read Books", "book.fill"),
-            ("Drink Water", "drop.fill"),
-            ("Exercise", "dumbbell.fill"),
-            ("Yoga", "figure.yoga"),
-            ("Journal", "book.closed.fill"),
-            ("Sleep Early", "moon.fill"),
-            ("Eat Healthy", "fork.knife"),
-            ("Learn Coding", "keyboard.fill"),
-            ("Practice Piano", "music.note"),
-            ("No Sugar", "cup.and.saucer.fill"),
-            ("Cold Shower", "drop.fill"),
-            ("Gratitude", "heart.fill"),
-            ("Walk 10k Steps", "figure.walk")
-        ]
-        
-        let colors = AppTheme.Colors.habitColors
-        
-        // Pick random habit and color
-        let randomHabit = testHabits.randomElement()!
-        let randomColor = colors.randomElement()!
-        
-        // Create the habit
-        let habit = Habit(
-            name: randomHabit.name,
-            icon: randomHabit.icon,
-            colorHex: randomColor.hex
-        )
-        
-        // Set creation date to 4 months ago
-        let calendar = Calendar.current
-        habit.createdAt = calendar.date(byAdding: .month, value: -4, to: Date()) ?? Date()
-        
-        modelContext.insert(habit)
-        
-        // Generate random completion data for last 4 months (~120 days)
-        let today = Date()
-        let daysToGenerate = 120
-        
-        // Random completion rate between 40% and 80%
-        let completionRate = Double.random(in: 0.4...0.8)
-        
-        for dayOffset in 0..<daysToGenerate {
-            guard let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
-            
-            // Random chance based on completion rate
-            // Make recent days more likely to be completed (for streak)
-            let adjustedRate: Double
-            if dayOffset < 7 {
-                adjustedRate = 0.85 // High chance for last week (builds streak)
-            } else if dayOffset < 30 {
-                adjustedRate = completionRate + 0.1
-            } else {
-                adjustedRate = completionRate
-            }
-            
-            if Double.random(in: 0...1) < adjustedRate {
-                let entry = HabitEntry(date: calendar.startOfDay(for: date), completed: true)
-                entry.habit = habit
-                habit.entries.append(entry)
-            }
-        }
-        
-        // Trigger widget refresh
-        refreshWidget()
-    }
-    
     private func refreshWidget() {
-        // Save habit data for widget
         WidgetDataManager.shared.saveHabitsForWidget(habits)
+    }
+}
+
+// MARK: - Habit Card View
+struct HabitCardView: View {
+    let habit: Habit
+    let onTap: () -> Void
+    
+    private var totalCompletedDays: Int {
+        habit.entries.filter { $0.completed }.count
+    }
+    
+    var body: some View {
+        VStack(spacing: AppTheme.Spacing.lg) {
+            // Contribution Grid
+            ContributionGridView(
+                habit: habit,
+                weekCount: 10,
+                showLabels: false,
+                cellSize: AppTheme.Grid.cellSize,
+                cellSpacing: AppTheme.Grid.cellSpacing
+            )
+            .onTapGesture {
+                onTap()
+            }
+            
+            // Habit Info
+            Text("\(totalCompletedDays) days of \(habit.name).")
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+        }
+        .padding(.horizontal, AppTheme.Spacing.xl)
     }
 }
 
@@ -301,4 +220,3 @@ struct HabitListView: View {
     HabitListView()
         .modelContainer(for: [Habit.self, HabitEntry.self], inMemory: true)
 }
-

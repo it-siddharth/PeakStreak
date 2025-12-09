@@ -7,88 +7,106 @@
 
 import SwiftUI
 
-// MARK: - Airbnb-Inspired Design System
+// MARK: - Minimalist Design System
 enum AppTheme {
+    
+    // MARK: - Custom Font Name
+    static let customFontName = "LovedbytheKing"
     
     // MARK: - Colors
     enum Colors {
-        // Primary
+        // Main Background - Beige
+        static let background = Color(hex: "#DAD9D1")!
+        
+        // Text - Black
+        static let text = Color.black
+        
+        // Grid Colors (Grayscale for in-app)
+        static let gridCompleted = Color(hex: "#404040")! // Dark gray for checked
+        static let gridNotCompleted = Color.white // White for unchecked
+        static let gridEmpty = Color(hex: "#D4D4D4")! // Light gray for future/empty
+        
+        // Button Colors
+        static let buttonBorder = Color.black
+        static let buttonFilled = Color.black
+        static let buttonText = Color.black
+        static let buttonTextFilled = Color.white
+        
+        // Legacy colors kept for backward compatibility and widget use
         static let coral = Color(hex: "#FF5A5F")!
-        static let coralDark = Color(hex: "#E04E53")!
-        
-        // Secondary
         static let teal = Color(hex: "#00A699")!
-        static let tealDark = Color(hex: "#008F82")!
         
-        // Neutrals
-        static let backgroundPrimary = Color(hex: "#FFFFFF")!
-        static let backgroundSecondary = Color(hex: "#F7F7F7")!
-        static let backgroundTertiary = Color(hex: "#EBEBEB")!
+        // Neutrals (kept for compatibility)
+        static let backgroundPrimary = Color.white
+        static let backgroundSecondary = background
+        static let backgroundTertiary = Color(hex: "#D4D4D4")!
         
-        static let textPrimary = Color(hex: "#222222")!
-        static let textSecondary = Color(hex: "#717171")!
-        static let textTertiary = Color(hex: "#B0B0B0")!
+        static let textPrimary = text
+        static let textSecondary = Color(hex: "#525252")!
+        static let textTertiary = Color(hex: "#737373")!
         
-        static let border = Color(hex: "#DDDDDD")!
-        static let borderLight = Color(hex: "#EBEBEB")!
+        static let border = Color.black
+        static let borderLight = Color(hex: "#D4D4D4")!
         
-        // Accent Colors for Habits
+        // Accent Colors for Widget Only
         static let habitColors: [(name: String, color: Color, hex: String)] = [
-            ("Coral", coral, "#FF5A5F"),
-            ("Teal", teal, "#00A699"),
-            ("Sunflower", Color(hex: "#FFB400")!, "#FFB400"),
-            ("Ocean", Color(hex: "#007AFF")!, "#007AFF"),
-            ("Mint", Color(hex: "#34C759")!, "#34C759"),
-            ("Peach", Color(hex: "#FF9500")!, "#FF9500"),
-            ("Berry", Color(hex: "#AF52DE")!, "#AF52DE"),
-            ("Lavender", Color(hex: "#914669")!, "#914669"),
-            ("Slate", Color(hex: "#5856D6")!, "#5856D6"),
-            ("Rose", Color(hex: "#FF2D55")!, "#FF2D55")
+            ("Gray", Color(hex: "#737373")!, "#737373"),
+            ("Silver", Color(hex: "#A3A3A3")!, "#A3A3A3"),
+            ("White", Color.white, "#FFFFFF"),
+            ("Coral", Color(hex: "#FF5A5F")!, "#FF5A5F"),
+            ("Orange", Color(hex: "#FF9500")!, "#FF9500"),
+            ("Red", Color(hex: "#FF2D55")!, "#FF2D55"),
+            ("Pink", Color(hex: "#FF2D92")!, "#FF2D92"),
+            ("Teal", Color(hex: "#00A699")!, "#00A699"),
+            ("Yellow", Color(hex: "#FFCC00")!, "#FFCC00"),
+            ("Green", Color(hex: "#34C759")!, "#34C759"),
+            ("Purple", Color(hex: "#AF52DE")!, "#AF52DE"),
+            ("Blue", Color(hex: "#007AFF")!, "#007AFF")
         ]
-        
-        // Contribution Grid Colors (based on habit color)
-        static func contributionColor(for baseColor: Color, intensity: Double) -> Color {
-            if intensity == 0 {
-                return backgroundTertiary
-            }
-            return baseColor.opacity(0.2 + (intensity * 0.8))
-        }
     }
     
-    // MARK: - Typography
+    // MARK: - Typography (Custom Font)
     enum Typography {
-        // Large Title - Used for main headers
-        static let largeTitle = Font.system(size: 34, weight: .bold, design: .rounded)
+        // Helper to get custom font with fallback
+        static func customFont(size: CGFloat) -> Font {
+            Font.custom(AppTheme.customFontName, size: size)
+        }
+        
+        // Large Title - Main quote text
+        static let largeTitle = customFont(size: 32)
         
         // Title 1 - Screen titles
-        static let title1 = Font.system(size: 28, weight: .bold, design: .rounded)
+        static let title1 = customFont(size: 28)
         
         // Title 2 - Section headers
-        static let title2 = Font.system(size: 22, weight: .semibold, design: .rounded)
+        static let title2 = customFont(size: 24)
         
         // Title 3 - Card titles
-        static let title3 = Font.system(size: 18, weight: .semibold, design: .rounded)
+        static let title3 = customFont(size: 20)
         
         // Headline - Emphasized text
-        static let headline = Font.system(size: 17, weight: .semibold, design: .rounded)
+        static let headline = customFont(size: 18)
         
         // Body - Regular text
-        static let body = Font.system(size: 17, weight: .regular, design: .rounded)
+        static let body = customFont(size: 32)
         
         // Callout - Secondary information
-        static let callout = Font.system(size: 16, weight: .regular, design: .rounded)
+        static let callout = customFont(size: 28)
         
         // Subheadline - Smaller secondary text
-        static let subheadline = Font.system(size: 15, weight: .regular, design: .rounded)
+        static let subheadline = customFont(size: 24)
         
         // Footnote - Tertiary information
-        static let footnote = Font.system(size: 13, weight: .regular, design: .rounded)
+        static let footnote = customFont(size: 20)
         
         // Caption - Smallest text
-        static let caption = Font.system(size: 12, weight: .regular, design: .rounded)
+        static let caption = customFont(size: 16)
         
         // Caption Bold
-        static let captionBold = Font.system(size: 12, weight: .semibold, design: .rounded)
+        static let captionBold = customFont(size: 16)
+        
+        // Button text
+        static let button = customFont(size: 32)
     }
     
     // MARK: - Spacing
@@ -106,24 +124,21 @@ enum AppTheme {
     
     // MARK: - Corner Radius
     enum CornerRadius {
-        static let small: CGFloat = 8
-        static let medium: CGFloat = 12
+        static let small: CGFloat = 4
+        static let medium: CGFloat = 8
         static let large: CGFloat = 16
         static let extraLarge: CGFloat = 24
+        static let pill: CGFloat = 110
         static let circular: CGFloat = 9999
     }
     
-    // MARK: - Shadows
-    enum Shadows {
-        static func card() -> some View {
-            Color.black.opacity(0.08)
-        }
-        
-        static let cardShadowRadius: CGFloat = 8
-        static let cardShadowY: CGFloat = 2
-        
-        static let buttonShadowRadius: CGFloat = 4
-        static let buttonShadowY: CGFloat = 2
+    // MARK: - Grid
+    enum Grid {
+        static let cellSize: CGFloat = 22
+        static let cellSpacing: CGFloat = 6
+        static let cellCornerRadius: CGFloat = 4
+        static let columns: Int = 10
+        static let rows: Int = 7
     }
     
     // MARK: - Animation
@@ -134,7 +149,7 @@ enum AppTheme {
         static let bouncy = SwiftUI.Animation.spring(response: 0.5, dampingFraction: 0.6)
     }
     
-    // MARK: - Icons (SF Symbols for habits)
+    // MARK: - Icons (SF Symbols for habits - minimal set)
     static let habitIcons: [String] = [
         "star.fill",
         "flame.fill",
@@ -147,52 +162,47 @@ enum AppTheme {
         "drop.fill",
         "moon.fill",
         "sun.max.fill",
-        "leaf.fill",
-        "brain.head.profile",
-        "paintbrush.fill",
-        "music.note",
-        "keyboard.fill",
-        "cup.and.saucer.fill",
-        "fork.knife",
-        "pill.fill",
-        "cross.fill",
-        "checkmark.seal.fill",
-        "target",
-        "chart.line.uptrend.xyaxis",
-        "graduationcap.fill"
+        "leaf.fill"
     ]
 }
 
-// MARK: - View Modifiers
-struct CardStyle: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background(AppTheme.Colors.backgroundPrimary)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.large))
-            .shadow(
-                color: Color.black.opacity(0.06),
-                radius: AppTheme.Shadows.cardShadowRadius,
-                x: 0,
-                y: AppTheme.Shadows.cardShadowY
+// MARK: - Pill Button Style (Outlined)
+struct PillButtonStyle: ButtonStyle {
+    var isFilled: Bool = false
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(AppTheme.Typography.button)
+            .foregroundColor(isFilled ? AppTheme.Colors.buttonTextFilled : AppTheme.Colors.buttonText)
+            .padding(.horizontal, AppTheme.Spacing.xxl)
+            .padding(.vertical, AppTheme.Spacing.lg)
+            .background(isFilled ? AppTheme.Colors.buttonFilled : Color.clear)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(AppTheme.Colors.buttonBorder, lineWidth: 1)
             )
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(AppTheme.Animation.quick, value: configuration.isPressed)
     }
 }
 
+// MARK: - Legacy Button Styles (for compatibility)
 struct PrimaryButtonStyle: ButtonStyle {
     let color: Color
     
-    init(color: Color = AppTheme.Colors.coral) {
+    init(color: Color = AppTheme.Colors.buttonFilled) {
         self.color = color
     }
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppTheme.Typography.headline)
+            .font(AppTheme.Typography.button)
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.md)
+            .padding(.vertical, AppTheme.Spacing.lg)
             .background(color)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
+            .clipShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(AppTheme.Animation.quick, value: configuration.isPressed)
     }
@@ -201,14 +211,27 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(AppTheme.Typography.headline)
+            .font(AppTheme.Typography.button)
             .foregroundColor(AppTheme.Colors.textPrimary)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, AppTheme.Spacing.md)
-            .background(AppTheme.Colors.backgroundSecondary)
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium))
+            .padding(.vertical, AppTheme.Spacing.lg)
+            .background(Color.clear)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(AppTheme.Colors.border, lineWidth: 1)
+            )
             .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
             .animation(AppTheme.Animation.quick, value: configuration.isPressed)
+    }
+}
+
+// MARK: - Card Style (simplified)
+struct CardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(AppTheme.Colors.backgroundPrimary)
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.CornerRadius.large))
     }
 }
 
@@ -218,3 +241,4 @@ extension View {
     }
 }
 
+// Note: Color extension with hex support is defined in Habit.swift

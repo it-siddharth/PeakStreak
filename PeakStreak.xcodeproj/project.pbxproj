@@ -10,6 +10,7 @@
 		359D338D2EE78F4500DBD26E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359D338C2EE78F4500DBD26E /* WidgetKit.framework */; };
 		359D338F2EE78F4500DBD26E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359D338E2EE78F4500DBD26E /* SwiftUI.framework */; };
 		359D33A02EE78F4700DBD26E /* PeakStreakWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 359D338A2EE78F4500DBD26E /* PeakStreakWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		359D33E42EE7A4E800DBD26E /* LovedbytheKing-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 359D33E22EE7A4E700DBD26E /* LovedbytheKing-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +43,7 @@
 		359D338C2EE78F4500DBD26E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		359D338E2EE78F4500DBD26E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		359D33A92EE7911100DBD26E /* PeakStreakWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PeakStreakWidgetExtension.entitlements; sourceTree = "<group>"; };
+		359D33E22EE7A4E700DBD26E /* LovedbytheKing-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "LovedbytheKing-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,11 +54,21 @@
 			);
 			target = 359D33892EE78F4500DBD26E /* PeakStreakWidgetExtension */;
 		};
+		359D33F12EE7B00000DBD26E /* Exceptions for "PeakStreak" folder in "PeakStreak" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 359D335B2EE7894D00DBD26E /* PeakStreak */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		359D335E2EE7894D00DBD26E /* PeakStreak */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				359D33F12EE7B00000DBD26E /* Exceptions for "PeakStreak" folder in "PeakStreak" target */,
+			);
 			path = PeakStreak;
 			sourceTree = "<group>";
 		};
@@ -93,6 +105,7 @@
 		359D33532EE7894D00DBD26E = {
 			isa = PBXGroup;
 			children = (
+				359D33E22EE7A4E700DBD26E /* LovedbytheKing-Regular.ttf */,
 				359D33A92EE7911100DBD26E /* PeakStreakWidgetExtension.entitlements */,
 				359D335E2EE7894D00DBD26E /* PeakStreak */,
 				359D33902EE78F4500DBD26E /* PeakStreakWidget */,
@@ -211,6 +224,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359D33E42EE7A4E800DBD26E /* LovedbytheKing-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,12 +394,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XAA6P4Q6;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PeakStreak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -413,12 +423,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XAA6P4Q6;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = PeakStreak/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
