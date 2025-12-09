@@ -287,33 +287,15 @@ struct SmallWidgetView: View {
         return weeks
     }
     
+    private let uncheckedColor = Color(hex: "#EBEBEB")! // Very light gray
+    
     private func cellColor(for date: Date) -> Color {
         if date > Date() {
-            return habit.color.opacity(0.3)
+            return uncheckedColor // Future days
         } else if habit.isCompleted(for: date) {
-            let intensity = calculateIntensity(for: date)
-            return habit.color.opacity(intensity)
+            return habit.color // Checked: selected color
         } else {
-            return habit.color.opacity(0.3)
-        }
-    }
-    
-    private func calculateIntensity(for date: Date) -> Double {
-        let calendar = Calendar.current
-        var nearbyCount = 0
-        
-        for offset in -3...3 {
-            if let checkDate = calendar.date(byAdding: .day, value: offset, to: date),
-               habit.isCompleted(for: checkDate) {
-                nearbyCount += 1
-            }
-        }
-        
-        switch nearbyCount {
-        case 0...1: return 0.5
-        case 2...3: return 0.7
-        case 4...5: return 0.85
-        default: return 1.0
+            return uncheckedColor // Unchecked: light gray
         }
     }
 }
@@ -408,33 +390,15 @@ struct MediumWidgetView: View {
         return weeks
     }
     
+    private let uncheckedColor = Color(hex: "#EBEBEB")! // Very light gray
+    
     private func cellColor(for date: Date) -> Color {
         if date > Date() {
-            return habit.color.opacity(0.3)
+            return uncheckedColor // Future days
         } else if habit.isCompleted(for: date) {
-            let intensity = calculateIntensity(for: date)
-            return habit.color.opacity(intensity)
+            return habit.color // Checked: selected color
         } else {
-            return habit.color.opacity(0.3)
-        }
-    }
-    
-    private func calculateIntensity(for date: Date) -> Double {
-        let calendar = Calendar.current
-        var nearbyCount = 0
-        
-        for offset in -3...3 {
-            if let checkDate = calendar.date(byAdding: .day, value: offset, to: date),
-               habit.isCompleted(for: checkDate) {
-                nearbyCount += 1
-            }
-        }
-        
-        switch nearbyCount {
-        case 0...1: return 0.5
-        case 2...3: return 0.7
-        case 4...5: return 0.85
-        default: return 1.0
+            return uncheckedColor // Unchecked: light gray
         }
     }
 }
