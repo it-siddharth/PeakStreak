@@ -7,6 +7,7 @@
 
 import WidgetKit
 import SwiftUI
+import AppIntents
 
 // MARK: - Color Extension
 extension Color {
@@ -64,6 +65,54 @@ struct WidgetDataLoader {
         }
         return habits
     }
+    
+    static func loadHabit(withId id: String) -> WidgetHabitData? {
+        return loadHabits().first { $0.id == id }
+    }
+}
+
+// MARK: - Habit App Entity
+struct HabitEntity: AppEntity {
+    var id: String
+    var name: String
+    var colorHex: String
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Habit"
+    static var defaultQuery = HabitEntityQuery()
+    
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(name)")
+    }
+}
+
+// MARK: - Habit Entity Query
+struct HabitEntityQuery: EntityQuery {
+    func entities(for identifiers: [HabitEntity.ID]) async throws -> [HabitEntity] {
+        let habits = WidgetDataLoader.loadHabits()
+        return habits
+            .filter { identifiers.contains($0.id) }
+            .map { HabitEntity(id: $0.id, name: $0.name, colorHex: $0.colorHex) }
+    }
+    
+    func suggestedEntities() async throws -> [HabitEntity] {
+        let habits = WidgetDataLoader.loadHabits()
+        return habits.map { HabitEntity(id: $0.id, name: $0.name, colorHex: $0.colorHex) }
+    }
+    
+    func defaultResult() async -> HabitEntity? {
+        let habits = WidgetDataLoader.loadHabits()
+        guard let first = habits.first else { return nil }
+        return HabitEntity(id: first.id, name: first.name, colorHex: first.colorHex)
+    }
+}
+
+// MARK: - Widget Configuration Intent
+struct SelectHabitIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "Select Habit"
+    static var description = IntentDescription("Choose which habit to display in the widget.")
+    
+    @Parameter(title: "Habit")
+    var habit: HabitEntity?
 }
 
 // MARK: - Widget Entry
@@ -73,7 +122,7 @@ struct HabitWidgetEntry: TimelineEntry {
 }
 
 // MARK: - Timeline Provider
-struct HabitProvider: TimelineProvider {
+struct HabitProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> HabitWidgetEntry {
         HabitWidgetEntry(
             date: Date(),
@@ -88,26 +137,30 @@ struct HabitProvider: TimelineProvider {
         )
     }
     
-    func getSnapshot(in context: Context, completion: @escaping (HabitWidgetEntry) -> Void) {
-        let habits = WidgetDataLoader.loadHabits()
-        let entry = HabitWidgetEntry(
-            date: Date(),
-            habit: habits.first ?? placeholder(in: context).habit
-        )
-        completion(entry)
+    func snapshot(for configuration: SelectHabitIntent, in context: Context) async -> HabitWidgetEntry {
+        let habit: WidgetHabitData?
+        if let selectedHabit = configuration.habit {
+            habit = WidgetDataLoader.loadHabit(withId: selectedHabit.id)
+        } else {
+            habit = WidgetDataLoader.loadHabits().first
+        }
+        
+        return HabitWidgetEntry(date: Date(), habit: habit ?? placeholder(in: context).habit)
     }
     
-    func getTimeline(in context: Context, completion: @escaping (Timeline<HabitWidgetEntry>) -> Void) {
-        let habits = WidgetDataLoader.loadHabits()
-        let entry = HabitWidgetEntry(
-            date: Date(),
-            habit: habits.first
-        )
+    func timeline(for configuration: SelectHabitIntent, in context: Context) async -> Timeline<HabitWidgetEntry> {
+        let habit: WidgetHabitData?
+        if let selectedHabit = configuration.habit {
+            habit = WidgetDataLoader.loadHabit(withId: selectedHabit.id)
+        } else {
+            habit = WidgetDataLoader.loadHabits().first
+        }
         
-        // Update every hour or at midnight
+        let entry = HabitWidgetEntry(date: Date(), habit: habit)
+        
+        // Update every hour
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: Date())!
-        let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
-        completion(timeline)
+        return Timeline(entries: [entry], policy: .after(nextUpdate))
     }
 }
 
@@ -172,7 +225,7 @@ struct SmallWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(8)
+        .padding(10)
     }
     
     private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
@@ -297,7 +350,7 @@ struct MediumWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(8)
+        .padding(10)
     }
     
     private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
@@ -391,7 +444,7 @@ struct PeakStreakWidget: Widget {
     let kind: String = "PeakStreakWidget"
     
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: HabitProvider()) { entry in
+        AppIntentConfiguration(kind: kind, intent: SelectHabitIntent.self, provider: HabitProvider()) { entry in
             StreakWidgetEntryView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
