@@ -130,12 +130,12 @@ struct HabitListView: View {
     
     // MARK: - Quote Section
     private var quoteSection: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 4) {
             Text("\"")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
             
-            Text("A journey that you do for\nyour better self")
+            Text("Great things come from hard work\nand perseverance. No excuses.")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
                 .multilineTextAlignment(.center)
@@ -144,6 +144,11 @@ struct HabitListView: View {
             Text("\"")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
+            
+            Text("— Kobe Bryant")
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.textSecondary)
+                .padding(.top, 4)
         }
         .padding(.horizontal, AppTheme.Spacing.xxl)
     }
