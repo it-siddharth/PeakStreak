@@ -236,13 +236,12 @@ struct SmallWidgetView: View {
     
     private func cellColor(for date: Date) -> Color {
         if date > Date() {
-            return Color(.systemGray5)
+            return habit.color.opacity(0.3)
         } else if habit.isCompleted(for: date) {
-            // Variable intensity based on nearby completions for richer look
             let intensity = calculateIntensity(for: date)
             return habit.color.opacity(intensity)
         } else {
-            return Color(.systemGray5)
+            return habit.color.opacity(0.3)
         }
     }
     
@@ -250,7 +249,6 @@ struct SmallWidgetView: View {
         let calendar = Calendar.current
         var nearbyCount = 0
         
-        // Check 3 days before and after for density
         for offset in -3...3 {
             if let checkDate = calendar.date(byAdding: .day, value: offset, to: date),
                habit.isCompleted(for: checkDate) {
@@ -258,11 +256,10 @@ struct SmallWidgetView: View {
             }
         }
         
-        // Map to intensity levels like GitHub
         switch nearbyCount {
-        case 0...1: return 0.4
-        case 2...3: return 0.6
-        case 4...5: return 0.8
+        case 0...1: return 0.5
+        case 2...3: return 0.7
+        case 4...5: return 0.85
         default: return 1.0
         }
     }
@@ -360,12 +357,12 @@ struct MediumWidgetView: View {
     
     private func cellColor(for date: Date) -> Color {
         if date > Date() {
-            return Color(.systemGray5)
+            return habit.color.opacity(0.3)
         } else if habit.isCompleted(for: date) {
             let intensity = calculateIntensity(for: date)
             return habit.color.opacity(intensity)
         } else {
-            return Color(.systemGray5)
+            return habit.color.opacity(0.3)
         }
     }
     
@@ -381,9 +378,9 @@ struct MediumWidgetView: View {
         }
         
         switch nearbyCount {
-        case 0...1: return 0.4
-        case 2...3: return 0.6
-        case 4...5: return 0.8
+        case 0...1: return 0.5
+        case 2...3: return 0.7
+        case 4...5: return 0.85
         default: return 1.0
         }
     }
