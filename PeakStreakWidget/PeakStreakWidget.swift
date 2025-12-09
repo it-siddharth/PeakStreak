@@ -172,7 +172,7 @@ struct SmallWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(6)
+        .padding(8)
     }
     
     private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
@@ -297,7 +297,7 @@ struct MediumWidgetView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(6)
+        .padding(8)
     }
     
     private func cornerRadius(weekIndex: Int, dayIndex: Int, totalWeeks: Int) -> (topLeading: CGFloat, bottomLeading: CGFloat, bottomTrailing: CGFloat, topTrailing: CGFloat) {
