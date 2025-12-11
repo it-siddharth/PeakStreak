@@ -41,6 +41,7 @@ struct ContributionGridView: View {
                             date: date,
                             isCompleted: habit.isCompleted(for: date),
                             isFuture: date.isFuture,
+                            habitColor: habit.color,
                             size: cellSize
                         ) {
                             toggleCompletion(for: date)
@@ -59,11 +60,12 @@ struct ContributionGridView: View {
     }
 }
 
-// MARK: - Contribution Cell (Grayscale)
+// MARK: - Contribution Cell (Uses habit color)
 struct ContributionCell: View {
     let date: Date
     let isCompleted: Bool
     let isFuture: Bool
+    let habitColor: Color
     let size: CGFloat
     let action: () -> Void
     
@@ -81,7 +83,7 @@ struct ContributionCell: View {
         if isFuture {
             return AppTheme.Colors.gridNotCompleted.opacity(0.3)
         } else if isCompleted {
-            return AppTheme.Colors.gridCompleted // White
+            return habitColor // Use habit's selected color
         } else {
             // Vary the gray slightly for visual interest
             return AppTheme.Colors.gridNotCompleted
