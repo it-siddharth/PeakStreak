@@ -17,6 +17,11 @@ struct HabitListView: View {
     @State private var selectedHabitIndex: Int = 0
     @State private var selectedHabit: Habit?
     
+    // Handwriting animation state
+    @State private var displayedQuote: String = ""
+    @State private var quoteAnimationComplete = false
+    private let fullQuote = "Great things come from hard work\nand perseverance. No excuses."
+    
     private var currentHabit: Habit? {
         guard !habits.isEmpty, selectedHabitIndex < habits.count else { return nil }
         return habits[selectedHabitIndex]
@@ -134,23 +139,51 @@ struct HabitListView: View {
             Text("\"")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
+                .opacity(displayedQuote.isEmpty ? 0 : 1)
             
-            Text("Great things come from hard work\nand perseverance. No excuses.")
+            Text(displayedQuote)
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+                .frame(minHeight: 60)
             
             Text("\"")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
+                .opacity(quoteAnimationComplete ? 1 : 0)
             
             Text("— Kobe Bryant")
                 .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.textSecondary)
                 .padding(.top, 4)
+                .opacity(quoteAnimationComplete ? 1 : 0)
+                .animation(.easeIn(duration: 0.3), value: quoteAnimationComplete)
         }
         .padding(.horizontal, AppTheme.Spacing.xxl)
+        .onAppear {
+            startHandwritingAnimation()
+        }
+    }
+    
+    // MARK: - Handwriting Animation
+    private func startHandwritingAnimation() {
+        guard displayedQuote.isEmpty else { return }
+        
+        var charIndex = 0
+        let characters = Array(fullQuote)
+        
+        Timer.scheduledTimer(withTimeInterval: 0.045, repeats: true) { timer in
+            if charIndex < characters.count {
+                displayedQuote.append(characters[charIndex])
+                charIndex += 1
+            } else {
+                timer.invalidate()
+                withAnimation(.easeIn(duration: 0.3)) {
+                    quoteAnimationComplete = true
+                }
+            }
+        }
     }
     
     // MARK: - Habit Cards Section
