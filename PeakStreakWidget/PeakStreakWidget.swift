@@ -410,7 +410,7 @@ struct PeakStreakWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: SelectHabitIntent.self, provider: HabitProvider()) { entry in
             StreakWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(Color.white, for: .widget)
         }
         .configurationDisplayName("Habit Streak")
         .description("Track your habit streaks with a GitHub-style contribution grid.")
