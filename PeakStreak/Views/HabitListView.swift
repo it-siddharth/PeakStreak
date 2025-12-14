@@ -37,6 +37,10 @@ struct HabitListView: View {
             AppTheme.Colors.background
                 .ignoresSafeArea()
             
+            // Soft noise layer
+            NoiseView()
+                .ignoresSafeArea()
+            
             if habits.isEmpty {
                 // Empty State - Begin Journey
                 emptyStateView
@@ -251,6 +255,25 @@ struct HabitCardView: View {
                 .foregroundColor(AppTheme.Colors.text)
         }
         .padding(.horizontal, AppTheme.Spacing.xl)
+    }
+}
+
+// MARK: - Noise View
+struct NoiseView: View {
+    var body: some View {
+        Canvas { context, size in
+            for _ in 0..<Int(size.width * size.height * 0.03) {
+                let x = CGFloat.random(in: 0..<size.width)
+                let y = CGFloat.random(in: 0..<size.height)
+                let opacity = Double.random(in: 0.02...0.06)
+                
+                context.fill(
+                    Path(ellipseIn: CGRect(x: x, y: y, width: 1, height: 1)),
+                    with: .color(Color.black.opacity(opacity))
+                )
+            }
+        }
+        .allowsHitTesting(false)
     }
 }
 
