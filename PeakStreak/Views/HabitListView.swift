@@ -41,6 +41,25 @@ struct HabitListView: View {
             NoiseView()
                 .ignoresSafeArea()
             
+            // Soft color gradient at bottom
+            if let habit = currentHabit {
+                VStack {
+                    Spacer()
+                    LinearGradient(
+                        colors: [
+                            habit.color.opacity(0),
+                            habit.color.opacity(0.15),
+                            habit.color.opacity(0.25)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 300)
+                }
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.4), value: selectedHabitIndex)
+            }
+            
             if habits.isEmpty {
                 // Empty State - Begin Journey
                 emptyStateView
