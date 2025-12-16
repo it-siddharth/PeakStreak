@@ -14,6 +14,7 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var showingDeleteAlert = false
+    @State private var showingInsights = false
     
     private var totalCompletedDays: Int {
         habit.entries.filter { $0.completed }.count
@@ -54,6 +55,9 @@ struct HabitDetailView: View {
         } message: {
             Text("Are you sure you want to delete '\(habit.name)'? This action cannot be undone.")
         }
+        .fullScreenCover(isPresented: $showingInsights) {
+            HabitInsightsView(habit: habit)
+        }
     }
     
     // MARK: - Navigation Bar
@@ -69,6 +73,12 @@ struct HabitDetailView: View {
             
             // Delete button (optional menu)
             Menu {
+                Button {
+                    showingInsights = true
+                } label: {
+                    Label("Insights", systemImage: "chart.bar")
+                }
+                
                 Button(role: .destructive) {
                     showingDeleteAlert = true
                 } label: {
