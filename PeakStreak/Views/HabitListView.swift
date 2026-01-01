@@ -17,10 +17,9 @@ struct HabitListView: View {
     @State private var selectedHabitIndex: Int = 0
     @State private var selectedHabit: Habit?
     
-    // Handwriting animation state
-    @State private var displayedQuote: String = ""
     @State private var quoteAnimationComplete = false
     private let fullQuote = "Great things come from hard work\nand perseverance. No excuses."
+    private let emptyStateTypingText = "Start your journey.\nOne day at a time."
     
     private var currentHabit: Habit? {
         guard !habits.isEmpty, selectedHabitIndex < habits.count else { return nil }
@@ -118,6 +117,15 @@ struct HabitListView: View {
         VStack {
             Spacer()
             
+            TypingText(text: emptyStateTypingText, interval: 0.04, showCursor: true)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, AppTheme.Spacing.xxl)
+                .frame(minHeight: 70)
+                .padding(.bottom, AppTheme.Spacing.lg)
+            
             Button(action: { showingAddHabit = true }) {
                 Text("Begin Journey")
             }
@@ -162,9 +170,20 @@ struct HabitListView: View {
             Text("\"")
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
-                .opacity(displayedQuote.isEmpty ? 0 : 1)
             
-            Text(displayedQuote)
+            TypingText(
+                text: fullQuote,
+                interval: 0.045,
+                showCursor: true,
+                onStarted: {
+                    quoteAnimationComplete = false
+                },
+                onCompleted: {
+                    withAnimation(.easeIn(duration: 0.3)) {
+                        quoteAnimationComplete = true
+                    }
+                }
+            )
                 .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.text)
                 .multilineTextAlignment(.center)
@@ -184,29 +203,6 @@ struct HabitListView: View {
                 .animation(.easeIn(duration: 0.3), value: quoteAnimationComplete)
         }
         .padding(.horizontal, AppTheme.Spacing.xxl)
-        .onAppear {
-            startHandwritingAnimation()
-        }
-    }
-    
-    // MARK: - Handwriting Animation
-    private func startHandwritingAnimation() {
-        guard displayedQuote.isEmpty else { return }
-        
-        var charIndex = 0
-        let characters = Array(fullQuote)
-        
-        Timer.scheduledTimer(withTimeInterval: 0.045, repeats: true) { timer in
-            if charIndex < characters.count {
-                displayedQuote.append(characters[charIndex])
-                charIndex += 1
-            } else {
-                timer.invalidate()
-                withAnimation(.easeIn(duration: 0.3)) {
-                    quoteAnimationComplete = true
-                }
-            }
-        }
     }
     
     // MARK: - Habit Cards Section
@@ -293,6 +289,99 @@ struct NoiseView: View {
             }
         }
         .allowsHitTesting(false)
+    }
+}
+
+// MARK: - Typing Text
+private struct TypingText: View {
+    let text: String
+    var interval: TimeInterval = 0.045
+    var showCursor: Bool = false
+    var cursor: String = "▍"
+    var cursorBlinkInterval: TimeInterval = 0.5
+    var onStarted: (() -> Void)? = nil
+    var onCompleted: (() -> Void)? = nil
+    
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
+    @State private var displayedText: String = ""
+    @State private var isComplete: Bool = false
+    @State private var cursorVisible: Bool = true
+    @State private var didFireCompletion: Bool = false
+    
+    var body: some View {
+        Text(displayedText + cursorSuffix)
+            .task(id: text) {
+                await startTyping()
+            }
+            .task(id: isComplete) {
+                await blinkCursorIfNeeded()
+            }
+    }
+    
+    private var cursorSuffix: String {
+        guard showCursor, !reduceMotion, !isComplete, cursorVisible else { return "" }
+        return cursor
+    }
+    
+    private func startTyping() async {
+        await MainActor.run {
+            displayedText = ""
+            isComplete = false
+            cursorVisible = true
+            didFireCompletion = false
+            onStarted?()
+        }
+        
+        if reduceMotion || text.isEmpty {
+            await MainActor.run {
+                displayedText = text
+                isComplete = true
+            }
+            fireCompletionIfNeeded()
+            return
+        }
+        
+        let characters = Array(text)
+        let nsPerChar = max(0, Int64(interval * 1_000_000_000))
+        
+        for char in characters {
+            if Task.isCancelled { return }
+            if nsPerChar > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(nsPerChar))
+            }
+            if Task.isCancelled { return }
+            await MainActor.run {
+                displayedText.append(char)
+            }
+        }
+        
+        await MainActor.run { isComplete = true }
+        fireCompletionIfNeeded()
+    }
+    
+    private func blinkCursorIfNeeded() async {
+        guard showCursor, !reduceMotion else { return }
+        guard !isComplete else { return }
+        
+        let ns = max(1, Int64(cursorBlinkInterval * 1_000_000_000))
+        while !Task.isCancelled {
+            if await MainActor.run({ isComplete }) { return }
+            try? await Task.sleep(nanoseconds: UInt64(ns))
+            if Task.isCancelled { return }
+            await MainActor.run {
+                cursorVisible.toggle()
+            }
+        }
+    }
+    
+    private func fireCompletionIfNeeded() {
+        guard !didFireCompletion else { return }
+        Task { @MainActor in
+            guard !didFireCompletion else { return }
+            didFireCompletion = true
+            onCompleted?()
+        }
     }
 }
 
