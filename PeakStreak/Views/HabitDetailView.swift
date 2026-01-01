@@ -22,8 +22,7 @@ struct HabitDetailView: View {
     var body: some View {
         ZStack {
             // Background
-            AppTheme.Colors.background
-                .ignoresSafeArea()
+            MeshGradientBackground(accentColor: habit.color)
             
             VStack(spacing: 0) {
                 // Navigation Bar
