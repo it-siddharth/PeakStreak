@@ -14,6 +14,7 @@ struct ContributionGridView: View {
     let showLabels: Bool
     let cellSize: CGFloat
     let cellSpacing: CGFloat
+    let onSuccess: (() -> Void)?
     
     @Environment(\.modelContext) private var modelContext
     
@@ -22,13 +23,15 @@ struct ContributionGridView: View {
         weekCount: Int = 10,
         showLabels: Bool = false,
         cellSize: CGFloat = AppTheme.Grid.cellSize,
-        cellSpacing: CGFloat = AppTheme.Grid.cellSpacing
+        cellSpacing: CGFloat = AppTheme.Grid.cellSpacing,
+        onSuccess: (() -> Void)? = nil
     ) {
         self.habit = habit
         self.weekCount = weekCount
         self.showLabels = showLabels
         self.cellSize = cellSize
         self.cellSpacing = cellSpacing
+        self.onSuccess = onSuccess
     }
     
     var body: some View {
@@ -53,8 +56,13 @@ struct ContributionGridView: View {
     
     private func toggleCompletion(for date: Date) {
         guard !date.isFuture else { return }
+        let wasCompleted = habit.isCompleted(for: date)
         withAnimation(AppTheme.Animation.quick) {
             habit.toggleCompletion(for: date, context: modelContext)
+        }
+        let isCompletedNow = habit.isCompleted(for: date)
+        if !wasCompleted, isCompletedNow {
+            onSuccess?()
         }
     }
 }

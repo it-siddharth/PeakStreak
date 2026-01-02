@@ -16,6 +16,7 @@ struct HabitListView: View {
     @State private var showingAddHabit = false
     @State private var selectedHabitIndex: Int = 0
     @State private var selectedHabit: Habit?
+    @State private var confettiTrigger = 0
     
     // Handwriting animation state
     @State private var displayedQuote: String = ""
@@ -79,6 +80,10 @@ struct HabitListView: View {
                 
                 Spacer()
             }
+            
+            ConfettiBurstView(trigger: confettiTrigger)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
         }
         .sheet(isPresented: $showingAddHabit) {
             AddHabitView()
@@ -213,9 +218,11 @@ struct HabitListView: View {
     private var habitCardsSection: some View {
         TabView(selection: $selectedHabitIndex) {
             ForEach(Array(habits.enumerated()), id: \.element.id) { index, habit in
-                HabitCardView(habit: habit) {
-                    selectedHabit = habit
-                }
+                HabitCardView(
+                    habit: habit,
+                    onTap: { selectedHabit = habit },
+                    onSuccess: { confettiTrigger += 1 }
+                )
                 .tag(index)
             }
         }
@@ -228,8 +235,13 @@ struct HabitListView: View {
     private var markButton: some View {
         Button(action: {
             guard let habit = currentHabit else { return }
+            let wasCompleted = habit.isCompleted(for: Date())
             withAnimation(AppTheme.Animation.bouncy) {
                 habit.toggleCompletion(for: Date(), context: modelContext)
+            }
+            let isCompletedNow = habit.isCompleted(for: Date())
+            if !wasCompleted, isCompletedNow {
+                confettiTrigger += 1
             }
             refreshWidget()
         }) {
@@ -249,6 +261,7 @@ struct HabitListView: View {
 struct HabitCardView: View {
     let habit: Habit
     let onTap: () -> Void
+    let onSuccess: () -> Void
     
     private var totalCompletedDays: Int {
         habit.entries.filter { $0.completed }.count
@@ -262,7 +275,8 @@ struct HabitCardView: View {
                 weekCount: 10,
                 showLabels: false,
                 cellSize: AppTheme.Grid.cellSize,
-                cellSpacing: AppTheme.Grid.cellSpacing
+                cellSpacing: AppTheme.Grid.cellSpacing,
+                onSuccess: onSuccess
             )
             .onTapGesture {
                 onTap()
