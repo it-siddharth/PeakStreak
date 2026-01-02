@@ -17,6 +17,14 @@ struct HabitListView: View {
     @State private var selectedHabitIndex: Int = 0
     @State private var selectedHabit: Habit?
     
+    // Image upload states
+    @State private var showImagePrompt = false
+    @State private var showImageSourcePicker = false
+    @State private var showPhotoPicker = false
+    @State private var showCamera = false
+    @State private var selectedImages: [UIImage] = []
+    @State private var cameraImage: UIImage?
+    
     // Handwriting animation state
     @State private var displayedQuote: String = ""
     @State private var quoteAnimationComplete = false
@@ -85,6 +93,43 @@ struct HabitListView: View {
         }
         .fullScreenCover(item: $selectedHabit) { habit in
             HabitDetailView(habit: habit)
+        }
+        .sheet(isPresented: $showImagePrompt) {
+            AddPhotoPromptView(
+                onAddPhoto: {
+                    showImagePrompt = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showImageSourcePicker = true
+                    }
+                },
+                onSkip: {
+                    showImagePrompt = false
+                }
+            )
+        }
+        .sheet(isPresented: $showImageSourcePicker) {
+            ImageSourcePicker(
+                showPhotoPicker: $showPhotoPicker,
+                showCamera: $showCamera
+            )
+        }
+        .sheet(isPresented: $showPhotoPicker) {
+            PhotoPickerView(selectedImages: $selectedImages)
+        }
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraPickerView(image: $cameraImage)
+        }
+        .onChange(of: selectedImages) { _, newImages in
+            if !newImages.isEmpty, let habit = currentHabit {
+                saveImages(newImages, for: habit)
+                selectedImages = []
+            }
+        }
+        .onChange(of: cameraImage) { _, newImage in
+            if let image = newImage, let habit = currentHabit {
+                saveImages([image], for: habit)
+                cameraImage = nil
+            }
         }
         .onChange(of: habits.count) {
             refreshWidget()
@@ -228,10 +273,25 @@ struct HabitListView: View {
     private var markButton: some View {
         Button(action: {
             guard let habit = currentHabit else { return }
-            withAnimation(AppTheme.Animation.bouncy) {
-                habit.toggleCompletion(for: Date(), context: modelContext)
+            
+            if !isCurrentHabitCompletedToday {
+                // Mark as completed and show photo prompt
+                withAnimation(AppTheme.Animation.bouncy) {
+                    habit.toggleCompletion(for: Date(), context: modelContext)
+                }
+                refreshWidget()
+                
+                // Show photo prompt after a short delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showImagePrompt = true
+                }
+            } else {
+                // Already completed, just toggle off
+                withAnimation(AppTheme.Animation.bouncy) {
+                    habit.toggleCompletion(for: Date(), context: modelContext)
+                }
+                refreshWidget()
             }
-            refreshWidget()
         }) {
             Text(isCurrentHabitCompletedToday ? "Done for today" : "Mark for today")
         }
@@ -243,6 +303,77 @@ struct HabitListView: View {
     private func refreshWidget() {
         WidgetDataManager.shared.saveHabitsForWidget(habits)
     }
+    
+    private func saveImages(_ uiImages: [UIImage], for habit: Habit) {
+        let entry = habit.getOrCreateEntry(for: Date(), context: modelContext)
+        
+        for uiImage in uiImages {
+            let resizedImage = ImageHelper.resizeImage(uiImage)
+            if let imageData = ImageHelper.compressImage(resizedImage) {
+                let dayImage = DayImage(imageData: imageData)
+                dayImage.entry = entry
+                entry.images.append(dayImage)
+            }
+        }
+    }
+}
+
+// MARK: - Add Photo Prompt View
+struct AddPhotoPromptView: View {
+    let onAddPhoto: () -> Void
+    let onSkip: () -> Void
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        ZStack {
+            AppTheme.Colors.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: AppTheme.Spacing.xl) {
+                // Handle
+                Capsule()
+                    .fill(AppTheme.Colors.textSecondary)
+                    .frame(width: 40, height: 4)
+                    .padding(.top, AppTheme.Spacing.md)
+                
+                Spacer()
+                
+                // Icon
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 48))
+                    .foregroundColor(AppTheme.Colors.text)
+                
+                // Title
+                Text("Capture the moment?")
+                    .font(AppTheme.Typography.title3)
+                    .foregroundColor(AppTheme.Colors.text)
+                
+                // Subtitle
+                Text("Add a photo to remember this day")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                
+                Spacer()
+                
+                // Buttons
+                VStack(spacing: AppTheme.Spacing.md) {
+                    Button(action: onAddPhoto) {
+                        Text("Add Photo")
+                    }
+                    .buttonStyle(PillButtonStyle(isFilled: true))
+                    
+                    Button(action: onSkip) {
+                        Text("Skip")
+                    }
+                    .buttonStyle(PillButtonStyle())
+                }
+                .padding(.horizontal, AppTheme.Spacing.xxl)
+                .padding(.bottom, AppTheme.Spacing.xxxl)
+            }
+        }
+        .presentationDetents([.medium])
+    }
 }
 
 // MARK: - Habit Card View
@@ -252,6 +383,10 @@ struct HabitCardView: View {
     
     private var totalCompletedDays: Int {
         habit.entries.filter { $0.completed }.count
+    }
+    
+    private var totalPhotos: Int {
+        habit.entries.reduce(0) { $0 + $1.images.count }
     }
     
     var body: some View {
@@ -269,9 +404,21 @@ struct HabitCardView: View {
             }
             
             // Habit Info
-            Text("\(totalCompletedDays) days of \(habit.name).")
-                .font(AppTheme.Typography.body)
-                .foregroundColor(AppTheme.Colors.text)
+            VStack(spacing: AppTheme.Spacing.xxs) {
+                Text("\(totalCompletedDays) days of \(habit.name).")
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.text)
+                
+                if totalPhotos > 0 {
+                    HStack(spacing: AppTheme.Spacing.xxs) {
+                        Image(systemName: "photo")
+                            .font(.system(size: 12))
+                        Text("\(totalPhotos)")
+                            .font(AppTheme.Typography.caption)
+                    }
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                }
+            }
         }
         .padding(.horizontal, AppTheme.Spacing.xl)
     }
@@ -298,5 +445,5 @@ struct NoiseView: View {
 
 #Preview {
     HabitListView()
-        .modelContainer(for: [Habit.self, HabitEntry.self], inMemory: true)
+        .modelContainer(for: [Habit.self, HabitEntry.self, DayImage.self], inMemory: true)
 }
