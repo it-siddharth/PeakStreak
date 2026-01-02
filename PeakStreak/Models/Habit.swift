@@ -88,6 +88,38 @@ final class Habit {
             entries.append(newEntry)
         }
     }
+    
+    // Get entry for a specific date
+    func entry(for date: Date) -> HabitEntry? {
+        let calendar = Calendar.current
+        let targetDay = calendar.startOfDay(for: date)
+        return entries.first { calendar.startOfDay(for: $0.date) == targetDay }
+    }
+    
+    // Get or create entry for a specific date
+    func getOrCreateEntry(for date: Date, context: ModelContext) -> HabitEntry {
+        let calendar = Calendar.current
+        let targetDay = calendar.startOfDay(for: date)
+        
+        if let existingEntry = entries.first(where: { calendar.startOfDay(for: $0.date) == targetDay }) {
+            return existingEntry
+        } else {
+            let newEntry = HabitEntry(date: targetDay, completed: true)
+            newEntry.habit = self
+            entries.append(newEntry)
+            return newEntry
+        }
+    }
+    
+    // Check if entry has images for a specific date
+    func hasImages(for date: Date) -> Bool {
+        entry(for: date)?.hasImages ?? false
+    }
+    
+    // Get all entries with images sorted by date
+    var entriesWithImages: [HabitEntry] {
+        entries.filter { $0.hasImages }.sorted { $0.date > $1.date }
+    }
 }
 
 @Model
@@ -96,11 +128,34 @@ final class HabitEntry {
     var date: Date
     var completed: Bool
     var habit: Habit?
+    var note: String?
     
-    init(date: Date, completed: Bool = false) {
+    @Relationship(deleteRule: .cascade, inverse: \DayImage.entry)
+    var images: [DayImage] = []
+    
+    init(date: Date, completed: Bool = false, note: String? = nil) {
         self.id = UUID()
         self.date = date
         self.completed = completed
+        self.note = note
+    }
+    
+    var hasImages: Bool {
+        !images.isEmpty
+    }
+}
+
+@Model
+final class DayImage {
+    var id: UUID
+    var imageData: Data
+    var createdAt: Date
+    var entry: HabitEntry?
+    
+    init(imageData: Data) {
+        self.id = UUID()
+        self.imageData = imageData
+        self.createdAt = Date()
     }
 }
 

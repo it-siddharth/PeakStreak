@@ -15,7 +15,7 @@ struct PeakStreakApp: App {
     init() {
         do {
             // Configure for App Group to share with widget
-            let schema = Schema([Habit.self, HabitEntry.self])
+            let schema = Schema([Habit.self, HabitEntry.self, DayImage.self])
             
             // Try to use App Group container for widget sharing
             let appGroupID = "group.com.itsiddharth.PeakStreak"

@@ -24,6 +24,10 @@
 	<array>
 		<string>LovedbytheKing-Regular.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>PeakStreak needs camera access to capture photos for your daily habit entries.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PeakStreak needs photo library access to let you add photos to your daily habit entries.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -14,9 +14,16 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var showingDeleteAlert = false
+    @State private var showingGallery = false
+    @State private var selectedDate: Date?
+    @State private var showingDayDetail = false
     
     private var totalCompletedDays: Int {
         habit.entries.filter { $0.completed }.count
+    }
+    
+    private var totalPhotos: Int {
+        habit.entries.reduce(0) { $0 + $1.images.count }
     }
     
     var body: some View {
@@ -38,7 +45,19 @@ struct HabitDetailView: View {
                 habitInfoSection
                     .padding(.top, AppTheme.Spacing.xl)
                 
+                // Gallery Button (if has photos)
+                if totalPhotos > 0 {
+                    galleryButton
+                        .padding(.top, AppTheme.Spacing.lg)
+                }
+                
                 Spacer()
+                
+                // Tip text
+                Text("Long press a day to view details")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .padding(.bottom, AppTheme.Spacing.md)
                 
                 // Squiggle at bottom
                 SquiggleView()
@@ -54,6 +73,14 @@ struct HabitDetailView: View {
         } message: {
             Text("Are you sure you want to delete '\(habit.name)'? This action cannot be undone.")
         }
+        .sheet(isPresented: $showingGallery) {
+            ImageGalleryView(habit: habit)
+        }
+        .sheet(isPresented: $showingDayDetail) {
+            if let date = selectedDate {
+                DayDetailView(habit: habit, date: date)
+            }
+        }
     }
     
     // MARK: - Navigation Bar
@@ -67,8 +94,16 @@ struct HabitDetailView: View {
             
             Spacer()
             
-            // Delete button (optional menu)
+            // Menu with options
             Menu {
+                if totalPhotos > 0 {
+                    Button {
+                        showingGallery = true
+                    } label: {
+                        Label("View Gallery", systemImage: "photo.on.rectangle")
+                    }
+                }
+                
                 Button(role: .destructive) {
                     showingDeleteAlert = true
                 } label: {
@@ -91,16 +126,47 @@ struct HabitDetailView: View {
             weekCount: 10,
             showLabels: false,
             cellSize: AppTheme.Grid.cellSize,
-            cellSpacing: AppTheme.Grid.cellSpacing
+            cellSpacing: AppTheme.Grid.cellSpacing,
+            onDateSelected: { date in
+                selectedDate = date
+                showingDayDetail = true
+            }
         )
         .padding(.horizontal, AppTheme.Spacing.xl)
     }
     
     // MARK: - Habit Info
     private var habitInfoSection: some View {
-        Text("\(totalCompletedDays) days of \(habit.name).")
-            .font(AppTheme.Typography.body)
+        VStack(spacing: AppTheme.Spacing.xs) {
+            Text("\(totalCompletedDays) days of \(habit.name).")
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.text)
+            
+            if totalPhotos > 0 {
+                Text("\(totalPhotos) photo\(totalPhotos == 1 ? "" : "s") captured")
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+        }
+    }
+    
+    // MARK: - Gallery Button
+    private var galleryButton: some View {
+        Button(action: { showingGallery = true }) {
+            HStack(spacing: AppTheme.Spacing.sm) {
+                Image(systemName: "photo.on.rectangle.angled")
+                    .font(.system(size: 16))
+                Text("View Gallery")
+                    .font(AppTheme.Typography.caption)
+            }
             .foregroundColor(AppTheme.Colors.text)
+            .padding(.horizontal, AppTheme.Spacing.lg)
+            .padding(.vertical, AppTheme.Spacing.sm)
+            .background(
+                Capsule()
+                    .stroke(AppTheme.Colors.border, lineWidth: 1)
+            )
+        }
     }
     
     // MARK: - Actions
@@ -111,7 +177,7 @@ struct HabitDetailView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(for: Habit.self, HabitEntry.self)
+    let container = try! ModelContainer(for: Habit.self, HabitEntry.self, DayImage.self)
     let habit = Habit(name: "Exercise", icon: "figure.run", colorHex: "#737373")
     container.mainContext.insert(habit)
     

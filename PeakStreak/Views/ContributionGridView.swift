@@ -14,6 +14,7 @@ struct ContributionGridView: View {
     let showLabels: Bool
     let cellSize: CGFloat
     let cellSpacing: CGFloat
+    var onDateSelected: ((Date) -> Void)?
     
     @Environment(\.modelContext) private var modelContext
     
@@ -22,13 +23,15 @@ struct ContributionGridView: View {
         weekCount: Int = 10,
         showLabels: Bool = false,
         cellSize: CGFloat = AppTheme.Grid.cellSize,
-        cellSpacing: CGFloat = AppTheme.Grid.cellSpacing
+        cellSpacing: CGFloat = AppTheme.Grid.cellSpacing,
+        onDateSelected: ((Date) -> Void)? = nil
     ) {
         self.habit = habit
         self.weekCount = weekCount
         self.showLabels = showLabels
         self.cellSize = cellSize
         self.cellSpacing = cellSpacing
+        self.onDateSelected = onDateSelected
     }
     
     var body: some View {
@@ -40,11 +43,16 @@ struct ContributionGridView: View {
                         ContributionCell(
                             date: date,
                             isCompleted: habit.isCompleted(for: date),
+                            hasImage: habit.hasImages(for: date),
                             isFuture: date.isFuture,
-                            size: cellSize
-                        ) {
-                            toggleCompletion(for: date)
-                        }
+                            size: cellSize,
+                            onTap: {
+                                toggleCompletion(for: date)
+                            },
+                            onLongPress: {
+                                onDateSelected?(date)
+                            }
+                        )
                     }
                 }
             }
@@ -63,17 +71,52 @@ struct ContributionGridView: View {
 struct ContributionCell: View {
     let date: Date
     let isCompleted: Bool
+    let hasImage: Bool
     let isFuture: Bool
     let size: CGFloat
-    let action: () -> Void
+    let onTap: () -> Void
+    let onLongPress: () -> Void
+    
+    init(
+        date: Date,
+        isCompleted: Bool,
+        hasImage: Bool = false,
+        isFuture: Bool,
+        size: CGFloat,
+        onTap: @escaping () -> Void,
+        onLongPress: @escaping () -> Void = {}
+    ) {
+        self.date = date
+        self.isCompleted = isCompleted
+        self.hasImage = hasImage
+        self.isFuture = isFuture
+        self.size = size
+        self.onTap = onTap
+        self.onLongPress = onLongPress
+    }
     
     var body: some View {
-        Button(action: action) {
+        ZStack {
             RoundedRectangle(cornerRadius: AppTheme.Grid.cellCornerRadius)
                 .fill(cellColor)
                 .frame(width: size, height: size)
+            
+            // Image indicator (small dot in corner)
+            if hasImage && !isFuture {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 6, height: 6)
+                    .offset(x: size/2 - 5, y: -size/2 + 5)
+            }
         }
-        .buttonStyle(.plain)
+        .onTapGesture {
+            onTap()
+        }
+        .onLongPressGesture(minimumDuration: 0.5) {
+            if !isFuture {
+                onLongPress()
+            }
+        }
         .disabled(isFuture)
     }
     
@@ -81,7 +124,7 @@ struct ContributionCell: View {
         if isFuture {
             return AppTheme.Colors.gridNotCompleted.opacity(0.3)
         } else if isCompleted {
-            return AppTheme.Colors.gridCompleted // White
+            return AppTheme.Colors.gridCompleted // Dark gray
         } else {
             // Vary the gray slightly for visual interest
             return AppTheme.Colors.gridNotCompleted
@@ -136,7 +179,7 @@ struct CompactContributionGrid: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(for: Habit.self, HabitEntry.self)
+    let container = try! ModelContainer(for: Habit.self, HabitEntry.self, DayImage.self)
     let habit = Habit(name: "Exercise", icon: "figure.run", colorHex: "#737373")
     container.mainContext.insert(habit)
     
