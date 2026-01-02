@@ -14,6 +14,7 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var showingDeleteAlert = false
+    @State private var confettiTrigger = 0
     
     private var totalCompletedDays: Int {
         habit.entries.filter { $0.completed }.count
@@ -45,6 +46,10 @@ struct HabitDetailView: View {
                     .frame(width: 80, height: 24)
                     .padding(.bottom, AppTheme.Spacing.xxxl)
             }
+            
+            ConfettiBurstView(trigger: confettiTrigger)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
         }
         .alert("Delete Journey", isPresented: $showingDeleteAlert) {
             Button("Cancel", role: .cancel) { }
@@ -91,7 +96,8 @@ struct HabitDetailView: View {
             weekCount: 10,
             showLabels: false,
             cellSize: AppTheme.Grid.cellSize,
-            cellSpacing: AppTheme.Grid.cellSpacing
+            cellSpacing: AppTheme.Grid.cellSpacing,
+            onSuccess: { confettiTrigger += 1 }
         )
         .padding(.horizontal, AppTheme.Spacing.xl)
     }
